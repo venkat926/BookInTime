@@ -18,10 +18,12 @@ public class SecurityConfig {
     private String adminAuthority;
 
     // User Authorization
+    // TODO: update requestMatchers after adding APIs
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/").permitAll()
+                .requestMatchers("/user/**").permitAll()
+                        .anyRequest().authenticated()
         ).formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable());
