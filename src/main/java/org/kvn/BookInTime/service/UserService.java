@@ -4,7 +4,9 @@ import org.kvn.BookInTime.dto.request.UserCreationRequestDTO;
 import org.kvn.BookInTime.dto.response.UserCreationResponseDTO;
 import org.kvn.BookInTime.enums.UserStatus;
 import org.kvn.BookInTime.enums.UserType;
+import org.kvn.BookInTime.model.Review;
 import org.kvn.BookInTime.model.Users;
+import org.kvn.BookInTime.repository.ReviewRepo;
 import org.kvn.BookInTime.repository.UserRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -35,6 +38,9 @@ public class UserService implements UserDetailsService {
 
     @Value("${admin.authority}")
     private String adminAuthority;
+
+    @Autowired
+    private ReviewRepo reviewRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -92,5 +98,9 @@ public class UserService implements UserDetailsService {
                 .phoneNo(user.getPhoneNo())
                 .address(user.getAddress())
                 .build();
+    }
+
+    public List<Review> getAllReviewsById(Integer userId) {
+        return reviewRepo.findByUserId(userId);
     }
 }

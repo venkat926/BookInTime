@@ -1,5 +1,6 @@
 package org.kvn.BookInTime.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -38,6 +39,7 @@ public class Users implements UserDetails {
     private String address;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -48,9 +50,13 @@ public class Users implements UserDetails {
 
     private String authorities;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JsonIgnoreProperties(value = {"show", "user"})
     private List<Ticket> bookedTickets;
+
+    @OneToMany
+    @JsonIgnoreProperties(value = {"movie", "user"})
+    private List<Review> reviews;
 
 
     @Override

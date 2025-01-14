@@ -14,4 +14,6 @@ public class MovieResponseDTO {
     private Genre genre;
 
     private Double rating;
+
+    private Integer totalReviews;
 }

@@ -28,8 +28,10 @@ public class Movie {
 
     private Double rating;
 
+    private Integer totalReviews;
+
     @OneToMany
-    @JsonIgnoreProperties(value = {"movie"})
+    @JsonIgnoreProperties(value = {"movie", "user"})
     private List<Review> reviews;
 
     @OneToMany

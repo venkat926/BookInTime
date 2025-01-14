@@ -21,6 +21,7 @@ public class MovieAdditionRequestDTO {
                 .title(title)
                 .genre(genre)
                 .rating(0.0)
+                .totalReviews(0)
                 .build();
     }
 }

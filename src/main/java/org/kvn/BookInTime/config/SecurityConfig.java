@@ -22,9 +22,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/user/addUser/**").permitAll()
+                        .requestMatchers("/user/addAdmin/**").permitAll()
+                        .requestMatchers("/user/getAllReviews/**").hasAuthority(userAuthority)
                         .requestMatchers("/movie/addMovie/**").hasAuthority(adminAuthority)
                         .requestMatchers("/movie/filter/**").permitAll()
+                        .requestMatchers("/movie/getAllReviews/**").permitAll()
+                        .requestMatchers("/review/addReview/**").hasAuthority(userAuthority)
+                        .requestMatchers("/review/getReview/**").permitAll()
+                        .requestMatchers("/review/deleteReview/**").hasAuthority(userAuthority)
                         .anyRequest().authenticated()
         ).formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())

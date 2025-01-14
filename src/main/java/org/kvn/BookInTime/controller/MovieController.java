@@ -2,10 +2,10 @@ package org.kvn.BookInTime.controller;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.NonNull;
 import org.kvn.BookInTime.dto.request.MovieAdditionRequestDTO;
 import org.kvn.BookInTime.dto.response.MovieResponseDTO;
 import org.kvn.BookInTime.enums.MovieFilter;
+import org.kvn.BookInTime.model.Review;
 import org.kvn.BookInTime.service.MovieService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,6 +49,17 @@ public class MovieController {
 
         List<MovieResponseDTO> movieResponseDTOList = movieService.filter(movieFilter, value);
         return new ResponseEntity<>(movieResponseDTOList, HttpStatus.OK);
+    }
+
+    /**
+     * get all reviews associated with movie
+     */
+    @GetMapping("/getAllReviews")
+    public ResponseEntity<List<Review>> getAllReviews(@RequestParam("id") Integer movieId){
+        logger.info("Received request to get all reviews");
+
+        List<Review> reviews = movieService.getAllReviews(movieId);
+        return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 
 }

@@ -3,8 +3,11 @@ package org.kvn.BookInTime.service;
 import org.kvn.BookInTime.dto.request.MovieAdditionRequestDTO;
 import org.kvn.BookInTime.dto.response.MovieResponseDTO;
 import org.kvn.BookInTime.enums.MovieFilter;
+import org.kvn.BookInTime.exception.MovieException;
 import org.kvn.BookInTime.model.Movie;
+import org.kvn.BookInTime.model.Review;
 import org.kvn.BookInTime.repository.MovieRepo;
+import org.kvn.BookInTime.repository.ReviewRepo;
 import org.kvn.BookInTime.service.movieFilter.MovieFilterFactory;
 import org.kvn.BookInTime.service.movieFilter.MovieFilterStrategy;
 import org.slf4j.Logger;
@@ -24,6 +27,8 @@ public class MovieService {
 
     @Autowired
     private MovieFilterFactory movieFilterFactory;
+    @Autowired
+    private ReviewRepo reviewRepo;
 
     // add movie to DB
     public MovieResponseDTO addMovie(MovieAdditionRequestDTO requestDTO) {
@@ -47,6 +52,7 @@ public class MovieService {
                 .title(movie.getTitle())
                 .genre(movie.getGenre())
                 .rating(movie.getRating())
+                .totalReviews(movie.getTotalReviews())
                 .build();
     }
 
@@ -59,8 +65,15 @@ public class MovieService {
                         .title(movie.getTitle())
                         .genre(movie.getGenre())
                         .rating(movie.getRating())
+                        .totalReviews(movie.getTotalReviews())
                         .build())
                 .toList();
+    }
+
+    public List<Review> getAllReviews(Integer movieId) {
+        Movie movie = movieRepo.findById(movieId)
+                .orElseThrow(() -> new MovieException("Movie not found with the id [ " + movieId + " ]"));
+        return reviewRepo.findByMovieId(movieId);
     }
 }
 
