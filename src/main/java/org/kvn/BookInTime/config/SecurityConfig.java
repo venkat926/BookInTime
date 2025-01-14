@@ -23,6 +23,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/user/**").permitAll()
+                        .requestMatchers("/movie/addMovie/**").hasAuthority(adminAuthority)
+                        .requestMatchers("/movie/filter/**").permitAll()
                         .anyRequest().authenticated()
         ).formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
