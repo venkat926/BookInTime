@@ -3,8 +3,11 @@ package org.kvn.BookInTime.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.kvn.BookInTime.enums.City;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -19,6 +22,7 @@ public class Theater {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     private String address;
@@ -33,5 +37,11 @@ public class Theater {
     private int regularSeatsCount;
 
     private int goldSeatsCount;
+
+    @CreationTimestamp
+    private Date createdOn;
+
+    @UpdateTimestamp
+    private Date updatedOn;
 
 }

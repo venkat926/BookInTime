@@ -31,6 +31,8 @@ public class SecurityConfig {
                         .requestMatchers("/review/addReview/**").hasAuthority(userAuthority)
                         .requestMatchers("/review/getReview/**").permitAll()
                         .requestMatchers("/review/deleteReview/**").hasAuthority(userAuthority)
+                        .requestMatchers("/theater/addTheater/**").hasAuthority(adminAuthority)
+                        .requestMatchers("/theater/getTheater").permitAll()
                         .anyRequest().authenticated()
         ).formLogin(Customizer.withDefaults())
                 .httpBasic(Customizer.withDefaults())
