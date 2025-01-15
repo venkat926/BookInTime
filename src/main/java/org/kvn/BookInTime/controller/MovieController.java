@@ -6,6 +6,7 @@ import org.kvn.BookInTime.dto.request.MovieAdditionRequestDTO;
 import org.kvn.BookInTime.dto.response.MovieResponseDTO;
 import org.kvn.BookInTime.enums.MovieFilter;
 import org.kvn.BookInTime.model.Review;
+import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.service.MovieService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,11 +56,21 @@ public class MovieController {
      * get all reviews associated with movie
      */
     @GetMapping("/getAllReviews")
-    public ResponseEntity<List<Review>> getAllReviews(@RequestParam("id") Integer movieId){
+    public ResponseEntity<List<Review>> getAllReviews(@RequestParam("id") Integer movieId) {
         logger.info("Received request to get all reviews");
 
         List<Review> reviews = movieService.getAllReviews(movieId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
+    }
+
+    /**
+     * API to get all the shows for a movie
+     */
+    @GetMapping("/gatAllShows")
+    public ResponseEntity<List<Show>> getAllShows(@RequestParam("id") Integer movieId) {
+        logger.info("Received request to get all shows for movie with id={}", movieId);
+
+        return new ResponseEntity<>(movieService.getAllShows(movieId), HttpStatus.OK);
     }
 
 }

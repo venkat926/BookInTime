@@ -6,6 +6,7 @@ import org.kvn.BookInTime.enums.MovieFilter;
 import org.kvn.BookInTime.exception.MovieException;
 import org.kvn.BookInTime.model.Movie;
 import org.kvn.BookInTime.model.Review;
+import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.repository.MovieRepo;
 import org.kvn.BookInTime.repository.ReviewRepo;
 import org.kvn.BookInTime.service.movieFilter.MovieFilterFactory;
@@ -29,6 +30,8 @@ public class MovieService {
     private MovieFilterFactory movieFilterFactory;
     @Autowired
     private ReviewRepo reviewRepo;
+    @Autowired
+    private ShowService showService;
 
     // add movie to DB
     public MovieResponseDTO addMovie(MovieAdditionRequestDTO requestDTO) {
@@ -74,6 +77,10 @@ public class MovieService {
         Movie movie = movieRepo.findById(movieId)
                 .orElseThrow(() -> new MovieException("Movie not found with the id [ " + movieId + " ]"));
         return reviewRepo.findByMovieId(movieId);
+    }
+
+    public List<Show> getAllShows(Integer movieId) {
+        return showService.getAllShowsForMovie(movieId);
     }
 }
 

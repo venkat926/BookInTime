@@ -18,8 +18,8 @@ public class TheaterCreationRequestDTO {
 
     private String address;
 
-    @NotNull(message = "City is required")
-    private City city;
+    @NotBlank(message = "City is required")
+    private String city;
 
     @NotBlank(message = "regularSeatsCount is required")
     private int regularSeatsCount;
@@ -31,7 +31,7 @@ public class TheaterCreationRequestDTO {
         return Theater.builder()
                 .name(name)
                 .address(address)
-                .city(city)
+                .city(City.valueOf(city))
                 .regularSeatsCount(regularSeatsCount)
                 .goldSeatsCount(goldSeatsCount)
                 .build();

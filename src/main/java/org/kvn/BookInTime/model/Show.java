@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.kvn.BookInTime.enums.ShowTiming;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -23,12 +24,19 @@ public class Show {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private LocalDateTime showTime;
+    @Column(nullable = false)
+    private Date showDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ShowTiming showTiming;
 
     @ManyToOne
+    @JsonIgnoreProperties(value = {"reviews", "shows"})
     private Movie movie;
 
     @ManyToOne
+    @JsonIgnoreProperties(value = {"shows"})
     private Theater theater;
 
     @OneToMany

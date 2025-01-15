@@ -18,6 +18,7 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false)
     private Integer seatNo;
 
     @Enumerated(EnumType.STRING)
@@ -25,6 +26,7 @@ public class Seat {
 
     private boolean isBooked;
 
+    @Column(nullable = false)
     private int price;
 
     @ManyToOne
@@ -33,5 +35,4 @@ public class Seat {
     @ManyToOne
     private Ticket ticket;
 
-    private Date bookingTime;
 }
