@@ -2,6 +2,7 @@ package org.kvn.BookInTime.service;
 
 import org.kvn.BookInTime.dto.request.MovieAdditionRequestDTO;
 import org.kvn.BookInTime.dto.response.MovieResponseDTO;
+import org.kvn.BookInTime.enums.Genre;
 import org.kvn.BookInTime.enums.MovieFilter;
 import org.kvn.BookInTime.exception.MovieException;
 import org.kvn.BookInTime.model.Movie;
@@ -81,6 +82,21 @@ public class MovieService {
 
     public List<Show> getAllShows(Integer movieId) {
         return showService.getAllShowsForMovie(movieId);
+    }
+
+    public List<MovieResponseDTO> getTop5MoviesByGenre(Genre genre) {
+
+        List<Movie> movies = movieRepo.findTop5MoviesByGenre(genre);
+        return movies.stream()
+                .map(movie ->
+                            MovieResponseDTO.builder()
+                                    .title(movie.getTitle())
+                                    .genre(movie.getGenre())
+                                    .rating(movie.getRating())
+                                    .totalReviews(movie.getTotalReviews())
+                            .build()
+                )
+                .toList();
     }
 }
 

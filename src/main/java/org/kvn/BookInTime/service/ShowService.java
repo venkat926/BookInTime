@@ -3,6 +3,7 @@ package org.kvn.BookInTime.service;
 import lombok.extern.slf4j.Slf4j;
 import org.kvn.BookInTime.dto.request.ShowCreationRequestDTO;
 import org.kvn.BookInTime.dto.response.ShowCreationResponseDTO;
+import org.kvn.BookInTime.enums.City;
 import org.kvn.BookInTime.enums.SeatType;
 import org.kvn.BookInTime.exception.MovieException;
 import org.kvn.BookInTime.exception.TheaterException;
@@ -109,5 +110,9 @@ public class ShowService {
 
     public List<Show> getAllShowsForMovie(Integer movieId) {
         return showRepo.findByMovieId(movieId);
+    }
+
+    public List<Show> getAllShowsInCity(City city) {
+        return showRepo.findByShowsByCity(city);
     }
 }

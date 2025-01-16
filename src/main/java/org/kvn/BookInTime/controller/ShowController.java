@@ -3,6 +3,7 @@ package org.kvn.BookInTime.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.kvn.BookInTime.dto.request.ShowCreationRequestDTO;
 import org.kvn.BookInTime.dto.response.ShowCreationResponseDTO;
+import org.kvn.BookInTime.enums.City;
 import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.repository.ShowRepo;
 import org.kvn.BookInTime.service.ShowService;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -37,5 +40,15 @@ public class ShowController {
         log.info("received a request to get a Show: ShowId:{}", showId);
 
         return showService.getShow(showId);
+    }
+
+    /**
+     * API to get all the shows running in a city
+     */
+    @GetMapping("/getShowsInCity")
+    public List<Show> getShowsInCity(@RequestParam("city") City city) {
+        log.info("received a request to get a ShowsInCity: city:{}", city);
+
+        return showService.getAllShowsInCity(city);
     }
 }

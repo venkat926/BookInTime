@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.kvn.BookInTime.dto.request.MovieAdditionRequestDTO;
 import org.kvn.BookInTime.dto.response.MovieResponseDTO;
+import org.kvn.BookInTime.enums.Genre;
 import org.kvn.BookInTime.enums.MovieFilter;
 import org.kvn.BookInTime.model.Review;
 import org.kvn.BookInTime.model.Show;
@@ -71,6 +72,16 @@ public class MovieController {
         logger.info("Received request to get all shows for movie with id={}", movieId);
 
         return new ResponseEntity<>(movieService.getAllShows(movieId), HttpStatus.OK);
+    }
+
+    /**
+     * API to get top 5 movies by genre
+     */
+    @GetMapping("/top5ByGenre")
+    public ResponseEntity<List<MovieResponseDTO>> getTop5ByGenre(@RequestParam("genre") Genre genre) {
+        logger.info("Received request to get top 5 Movies for genre={}", genre);
+
+        return new ResponseEntity<>(movieService.getTop5MoviesByGenre(genre), HttpStatus.OK);
     }
 
 }
