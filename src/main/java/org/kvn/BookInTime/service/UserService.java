@@ -1,5 +1,6 @@
 package org.kvn.BookInTime.service;
 
+import org.kvn.BookInTime.consumer.UserCreationNotification;
 import org.kvn.BookInTime.dto.request.UserCreationRequestDTO;
 import org.kvn.BookInTime.dto.response.UserCreationResponseDTO;
 import org.kvn.BookInTime.enums.UserStatus;
@@ -47,6 +48,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private TicketRepo ticketRepo;
 
+    @Autowired
+    private UserCreationNotification userCreationNotification;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepo.findByEmail(username);
@@ -61,7 +65,11 @@ public class UserService implements UserDetailsService {
         user.setAuthorities(userAuthority);
 
         // save user to DB
-        return saveUserOrAdmin(user);
+        UserCreationResponseDTO responseDTO = saveUserOrAdmin(user);
+        // send email notification
+        userCreationNotification.sendNotification(responseDTO);
+        // return response
+        return responseDTO;
     }
 
     public UserCreationResponseDTO addAdmin(UserCreationRequestDTO requestDTO) {
@@ -91,7 +99,6 @@ public class UserService implements UserDetailsService {
         }
 
         // return response
-        if (user == null) return null;
         return getUserCreationResponseDTO(user);
     }
 

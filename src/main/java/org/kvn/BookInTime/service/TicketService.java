@@ -2,6 +2,7 @@ package org.kvn.BookInTime.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.kvn.BookInTime.consumer.TicketBookingNotification;
 import org.kvn.BookInTime.dto.request.TicketBookingRequestDTO;
 import org.kvn.BookInTime.dto.response.TicketBookingResponseDTO;
 import org.kvn.BookInTime.enums.SeatType;
@@ -35,6 +36,8 @@ public class TicketService {
     private SeatRepo seatRepo;
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private TicketBookingNotification ticketBookingNotification;
 
     @Transactional
     public TicketBookingResponseDTO bookTickets(TicketBookingRequestDTO requestDTO, Users user) {
@@ -86,7 +89,7 @@ public class TicketService {
         user.setBookedTickets(userTickets);
         userRepo.save(user);
 
-        return TicketBookingResponseDTO.builder()
+        TicketBookingResponseDTO responseDTO = TicketBookingResponseDTO.builder()
                 .ticketStatus(ticket.getTicketStatus())
                 .ticketPrice(ticket.getAmount())
                 .showdate(show.getShowDate())
@@ -96,6 +99,12 @@ public class TicketService {
                 .bookedSeats(bookedSeats)
                 .bookedAt(ticket.getBookingTime())
                 .build();
+
+        // send email notification
+        ticketBookingNotification.sendTicketBookedNotification(ticket);
+
+        // return response
+        return responseDTO;
 
 
     }
@@ -121,8 +130,11 @@ public class TicketService {
             seat.setBooked(false);
             seat.setTicket(null);
         });
+        ticket.setBookedSeats(null);
         seatRepo.saveAll(bookedSeats);
 
+        // send email notification
+        ticketBookingNotification.sendTicketCancelledNotification(ticket);
         // return response
         return ticket;
     }
