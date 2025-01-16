@@ -3,6 +3,7 @@ package org.kvn.BookInTime.exceptionHandler;
 import org.kvn.BookInTime.exception.MovieException;
 import org.kvn.BookInTime.exception.ReviewException;
 import org.kvn.BookInTime.exception.TheaterException;
+import org.kvn.BookInTime.exception.TicketException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,10 @@ public class ControllerExceptionHandler {
 
     @ExceptionHandler(TheaterException.class)
     public ResponseEntity<Object> handleReviewException(TheaterException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(TicketException.class)
+    public ResponseEntity<Object> handleReviewException(TicketException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

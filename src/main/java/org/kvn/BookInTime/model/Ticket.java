@@ -1,9 +1,11 @@
 package org.kvn.BookInTime.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.kvn.BookInTime.enums.TicketStatus;
 
 import java.util.Date;
@@ -27,9 +29,11 @@ public class Ticket {
     private Double amount;
 
     @ManyToOne
+    @JsonIgnoreProperties(value = {"bookedTickets", "seats"})
     private Show show;
 
     @ManyToOne
+    @JsonIgnore
     private Users user;
 
     @OneToMany
@@ -38,5 +42,8 @@ public class Ticket {
 
     @CreationTimestamp
     private Date bookingTime;
+
+    @UpdateTimestamp
+    private Date updateTime;
 
 }

@@ -1,5 +1,6 @@
 package org.kvn.BookInTime.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.kvn.BookInTime.enums.SeatType;
@@ -30,9 +31,11 @@ public class Seat {
     private int price;
 
     @ManyToOne
+    @JsonIgnore
     private Show show;
 
     @ManyToOne
+    @JsonIgnore
     private Ticket ticket;
 
 }

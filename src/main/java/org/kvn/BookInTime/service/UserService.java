@@ -5,8 +5,10 @@ import org.kvn.BookInTime.dto.response.UserCreationResponseDTO;
 import org.kvn.BookInTime.enums.UserStatus;
 import org.kvn.BookInTime.enums.UserType;
 import org.kvn.BookInTime.model.Review;
+import org.kvn.BookInTime.model.Ticket;
 import org.kvn.BookInTime.model.Users;
 import org.kvn.BookInTime.repository.ReviewRepo;
+import org.kvn.BookInTime.repository.TicketRepo;
 import org.kvn.BookInTime.repository.UserRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +43,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private ReviewRepo reviewRepo;
+
+    @Autowired
+    private TicketRepo ticketRepo;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -102,5 +107,9 @@ public class UserService implements UserDetailsService {
 
     public List<Review> getAllReviewsById(Integer userId) {
         return reviewRepo.findByUserId(userId);
+    }
+
+    public List<Ticket> getAllTicketsForUser(Users user) {
+        return ticketRepo.findByUserId(user.getId());
     }
 }
