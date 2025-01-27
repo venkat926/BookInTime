@@ -6,7 +6,6 @@ import lombok.*;
 import org.kvn.BookInTime.enums.SeatType;
 
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity
 @Getter
