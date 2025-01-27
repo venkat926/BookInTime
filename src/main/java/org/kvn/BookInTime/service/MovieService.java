@@ -8,8 +8,12 @@ import org.kvn.BookInTime.exception.MovieException;
 import org.kvn.BookInTime.model.Movie;
 import org.kvn.BookInTime.model.Review;
 import org.kvn.BookInTime.model.Show;
-import org.kvn.BookInTime.repository.MovieRepo;
-import org.kvn.BookInTime.repository.ReviewRepo;
+import org.kvn.BookInTime.repository.CacheRepo.MovieCacheRepo;
+import org.kvn.BookInTime.repository.CacheRepo.ReviewCacheRepo;
+import org.kvn.BookInTime.repository.CacheRepo.ShowCacheRepo;
+import org.kvn.BookInTime.repository.JPARepo.MovieRepo;
+import org.kvn.BookInTime.repository.JPARepo.ReviewRepo;
+import org.kvn.BookInTime.repository.JPARepo.ShowRepo;
 import org.kvn.BookInTime.service.movieFilter.MovieFilterFactory;
 import org.kvn.BookInTime.service.movieFilter.MovieFilterStrategy;
 import org.slf4j.Logger;
@@ -33,6 +37,14 @@ public class MovieService {
     private ReviewRepo reviewRepo;
     @Autowired
     private ShowService showService;
+    @Autowired
+    private MovieCacheRepo movieCacheRepo;
+    @Autowired
+    private ReviewCacheRepo reviewCacheRepo;
+    @Autowired
+    private ShowCacheRepo showCacheRepo;
+    @Autowired
+    private ShowRepo showRepo;
 
     // add movie to DB
     public MovieResponseDTO addMovie(MovieAdditionRequestDTO requestDTO) {
@@ -41,6 +53,8 @@ public class MovieService {
         // handle exception
         try {
             movie = movieRepo.save(movie);
+            // adding movie to cache
+            movieCacheRepo.saveMovie(movie, movie.getReviews(), movie.getShows());
         } catch (DataIntegrityViolationException e) {
             logger.error(e.getMessage());
 
@@ -51,7 +65,6 @@ public class MovieService {
         }
 
         // return response
-        if (movie == null) return null;
         return MovieResponseDTO.builder()
                 .title(movie.getTitle())
                 .genre(movie.getGenre())
@@ -75,13 +88,57 @@ public class MovieService {
     }
 
     public List<Review> getAllReviews(Integer movieId) {
-        Movie movie = movieRepo.findById(movieId)
-                .orElseThrow(() -> new MovieException("Movie not found with the id [ " + movieId + " ]"));
-        return reviewRepo.findByMovieId(movieId);
+
+        // fetch movieReviewIDs from cache
+        List<Integer> reviewIds = movieCacheRepo.getMovieReviewIds(movieId);
+        if (reviewIds == null) {
+            Movie movie = movieRepo.findById(movieId)
+                    .orElseThrow(() -> new MovieException("Movie not found with the id [ " + movieId + " ]"));
+            List<Review> reviews = movie.getReviews();
+            movieCacheRepo.saveMovie(movie, reviews, movie.getShows());
+            return reviews;
+        } else {
+            return reviewIds.stream()
+                    .map(reviewId -> {
+                        Review review = reviewCacheRepo.getReview(reviewId);
+                        if (review == null) {
+                            // Fetch review from DB if not found in cache
+                            review = reviewRepo.findById(reviewId).orElse(null);
+
+                            // Optionally add it to the cache for future use
+                            if (review != null) {
+                                reviewCacheRepo.saveReview(review);
+                            }
+                        }
+                        return review;
+                    })
+                    .toList();
+        }
     }
 
     public List<Show> getAllShows(Integer movieId) {
-        return showService.getAllShowsForMovie(movieId);
+        // fetch all showIDs for this movie
+        List<Integer> showIDs = movieCacheRepo.getMovieShowIds(movieId);
+        if (showIDs == null) {
+            List<Show> shows = showService.getAllShowsForMovie(movieId);
+            if (shows != null)
+                movieCacheRepo.saveMovieShows(movieId, shows);
+            return shows;
+        } else {
+            return showIDs.stream()
+                    .map(showId -> {
+                        Show show = showCacheRepo.getShow(showId);
+                        if (show == null) {
+                            // fetch show from db if not found in cache
+                            show = showRepo.findById(showId).orElse(null);
+                            if (show != null) {
+                                showCacheRepo.saveShow(show);
+                            }
+                        }
+                        return show;
+                    })
+                    .toList();
+        }
     }
 
     public List<MovieResponseDTO> getTop5MoviesByGenre(Genre genre) {

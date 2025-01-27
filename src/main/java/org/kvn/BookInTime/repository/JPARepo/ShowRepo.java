@@ -1,4 +1,4 @@
-package org.kvn.BookInTime.repository;
+package org.kvn.BookInTime.repository.JPARepo;
 
 import org.kvn.BookInTime.enums.City;
 import org.kvn.BookInTime.model.Show;

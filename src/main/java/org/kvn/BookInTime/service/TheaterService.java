@@ -6,7 +6,7 @@ import org.kvn.BookInTime.dto.response.TheaterResponseDTO;
 import org.kvn.BookInTime.exception.TheaterException;
 import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.model.Theater;
-import org.kvn.BookInTime.repository.TheaterRepo;
+import org.kvn.BookInTime.repository.JPARepo.TheaterRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;

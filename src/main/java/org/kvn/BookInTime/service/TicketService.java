@@ -13,10 +13,11 @@ import org.kvn.BookInTime.model.Seat;
 import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.model.Ticket;
 import org.kvn.BookInTime.model.Users;
-import org.kvn.BookInTime.repository.SeatRepo;
-import org.kvn.BookInTime.repository.ShowRepo;
-import org.kvn.BookInTime.repository.TicketRepo;
-import org.kvn.BookInTime.repository.UserRepo;
+import org.kvn.BookInTime.repository.CacheRepo.UserCacheRepo;
+import org.kvn.BookInTime.repository.JPARepo.SeatRepo;
+import org.kvn.BookInTime.repository.JPARepo.ShowRepo;
+import org.kvn.BookInTime.repository.JPARepo.TicketRepo;
+import org.kvn.BookInTime.repository.JPARepo.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,8 @@ public class TicketService {
     private UserRepo userRepo;
     @Autowired
     private TicketBookingNotification ticketBookingNotification;
+    @Autowired
+    private UserCacheRepo userCacheRepo;
 
     @Transactional
     public TicketBookingResponseDTO bookTickets(TicketBookingRequestDTO requestDTO, Users user) {
@@ -83,11 +86,23 @@ public class TicketService {
         ticket.setBookedSeats(bookedSeats);
         ticketRepo.save(ticket);
         seatRepo.saveAll(bookedSeats);
-        user = userRepo.findById(user.getId()).orElse(null);
+        // get user
+        Integer userId = user.getId();
+        user = userCacheRepo.getUser(userId);
+        if (user == null) {
+            user = userRepo.findById(userId).orElse(null);
+        } else {
+            log.info("user details has been fetched from Redis cache ; {}", user);
+
+        }
+
         List<Ticket> userTickets = user.getBookedTickets();
         userTickets.add(ticket);
         user.setBookedTickets(userTickets);
         userRepo.save(user);
+        user.getBookedTickets().size();
+        user.getReviews().size();
+        userCacheRepo.setUser(user.getId(), user);
 
         TicketBookingResponseDTO responseDTO = TicketBookingResponseDTO.builder()
                 .ticketStatus(ticket.getTicketStatus())

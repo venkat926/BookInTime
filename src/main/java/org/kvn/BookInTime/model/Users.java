@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class Users implements UserDetails {
 
