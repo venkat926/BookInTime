@@ -7,8 +7,9 @@ import org.kvn.BookInTime.exception.ReviewException;
 import org.kvn.BookInTime.model.Movie;
 import org.kvn.BookInTime.model.Review;
 import org.kvn.BookInTime.model.Users;
-import org.kvn.BookInTime.repository.MovieRepo;
-import org.kvn.BookInTime.repository.ReviewRepo;
+import org.kvn.BookInTime.repository.JPARepo.MovieRepo;
+import org.kvn.BookInTime.repository.JPARepo.ReviewRepo;
+import org.kvn.BookInTime.repository.cacheRepo.ReviewCacheRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class ReviewService {
 
     @Autowired
     private MovieRepo movieRepo;
+    @Autowired
+    private ReviewCacheRepo reviewCacheRepo;
 
     public static void setLog(Logger log) {
         ReviewService.log = log;
@@ -53,6 +56,9 @@ public class ReviewService {
 
         // save the review
         reviewRepo.save(review);
+        // save review to cache
+        review.setMovie(movie);
+        reviewCacheRepo.saveReview(review);
 
         // update movie's overall rating
         Double currentTotalRating = movie.getRating() * movie.getTotalReviews();
@@ -69,7 +75,19 @@ public class ReviewService {
     }
 
     public Review getReviewById(Integer id) {
-        return reviewRepo.findById(id).orElse(null);
+        // check cache for review
+        Review review = reviewCacheRepo.getReview(id);
+        // if review not found in cache
+        if (review == null) {
+            log.info("Review not found in cache with ID: " + id + " : checking DB");
+            review = reviewRepo.findById(id).orElse(null);
+            // save review to cache
+            if (review != null)
+                reviewCacheRepo.saveReview(review, review.getMovie());
+        } else {
+            log.info("Review found in cache with ID: " + id);
+        }
+        return review;
     }
 
     @Transactional
@@ -101,6 +119,7 @@ public class ReviewService {
 
         // delete the review from db
         reviewRepo.delete(review);
+        reviewCacheRepo.deleteReview(review.getId());
 
         // return response
         return "Review deleted successfully";

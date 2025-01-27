@@ -11,10 +11,11 @@ import org.kvn.BookInTime.model.Movie;
 import org.kvn.BookInTime.model.Seat;
 import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.model.Theater;
-import org.kvn.BookInTime.repository.MovieRepo;
-import org.kvn.BookInTime.repository.SeatRepo;
-import org.kvn.BookInTime.repository.ShowRepo;
-import org.kvn.BookInTime.repository.TheaterRepo;
+import org.kvn.BookInTime.repository.JPARepo.MovieRepo;
+import org.kvn.BookInTime.repository.JPARepo.SeatRepo;
+import org.kvn.BookInTime.repository.JPARepo.ShowRepo;
+import org.kvn.BookInTime.repository.JPARepo.TheaterRepo;
+import org.kvn.BookInTime.repository.cacheRepo.ShowCacheRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,8 @@ public class ShowService {
 
     @Value("${seat.regularseat.price}")
     private Integer REGULAR_SEAT_PRICE;
+    @Autowired
+    private ShowCacheRepo showCacheRepo;
 
 
     public ShowCreationResponseDTO addShow(ShowCreationRequestDTO requestDTO) {
@@ -62,6 +65,9 @@ public class ShowService {
         show.setSeats(seats);
         showRepo.save(show);
         updateSeats(show, seats);
+
+        // save show to cache
+        showCacheRepo.saveShow(show);
 
         // return response
         return ShowCreationResponseDTO.builder()
@@ -101,7 +107,19 @@ public class ShowService {
     }
 
     public Show getShow(Integer showId) {
-        return showRepo.findById(showId).orElse(null);
+        // check cache for show
+        Show show = showCacheRepo.getShow(showId);
+        // if show details are not present in cache
+        if (show == null) {
+            log.info("Show details not found in cache for showId: {} : checking DB", showId );
+            show = showRepo.findById(showId).orElse(null);
+            // save show to cache
+            if (show != null)
+                showCacheRepo.saveShow(show, show.getMovie(), show.getTheater());
+        } else {
+            log.info("Show found in cache for showId: {}", showId);
+        }
+        return show;
     }
 
     public List<Show> getAllShowsInTheater(Integer theaterId) {

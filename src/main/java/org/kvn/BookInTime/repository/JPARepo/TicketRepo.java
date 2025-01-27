@@ -1,4 +1,4 @@
-package org.kvn.BookInTime.repository;
+package org.kvn.BookInTime.repository.JPARepo;
 
 import org.kvn.BookInTime.model.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;

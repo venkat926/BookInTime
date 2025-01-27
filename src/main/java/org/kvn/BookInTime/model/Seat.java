@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.kvn.BookInTime.enums.SeatType;
 
+import java.io.Serializable;
 import java.util.Date;
 
 @Entity
@@ -13,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Seat {
+public class Seat implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

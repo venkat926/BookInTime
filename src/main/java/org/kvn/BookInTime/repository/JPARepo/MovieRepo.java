@@ -1,8 +1,7 @@
-package org.kvn.BookInTime.repository;
+package org.kvn.BookInTime.repository.JPARepo;
 
 import org.kvn.BookInTime.enums.Genre;
 import org.kvn.BookInTime.model.Movie;
-import org.kvn.BookInTime.model.Show;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

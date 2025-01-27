@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.kvn.BookInTime.enums.Genre;
 
+import java.io.Serializable;
 import java.util.List;
 
 
@@ -14,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Movie {
+public class Movie implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

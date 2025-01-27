@@ -6,7 +6,8 @@ import org.kvn.BookInTime.dto.response.TheaterResponseDTO;
 import org.kvn.BookInTime.exception.TheaterException;
 import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.model.Theater;
-import org.kvn.BookInTime.repository.TheaterRepo;
+import org.kvn.BookInTime.repository.JPARepo.TheaterRepo;
+import org.kvn.BookInTime.repository.cacheRepo.TheaterCacheRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,17 @@ public class TheaterService {
     @Autowired
     private ShowService showService;
 
+    @Autowired
+    private TheaterCacheRepo theaterCacheRepo;
+
     public TheaterResponseDTO addTheater(TheaterCreationRequestDTO requestDTO) {
         Theater theater = requestDTO.toTheater();
 
         // handle exception
         try {
             theaterRepo.save(theater);
+            // save theater to cache
+            theaterCacheRepo.saveTheater(theater);
         } catch (DataIntegrityViolationException e) {
             log.error(e.getMessage());
 
@@ -48,8 +54,19 @@ public class TheaterService {
     }
 
     public TheaterResponseDTO getTheater(Integer theaterId) {
-        Theater theater = theaterRepo.findById(theaterId)
-                .orElseThrow(() -> new TheaterException("No theater exists with id [" + theaterId + "]"));
+        // check cache for theater
+        Theater theater = theaterCacheRepo.getTheater(theaterId);
+
+        // if theater is not found in cache
+        if (theater == null)  {
+            log.info("theater not found in cache, checking DB");
+            theater = theaterRepo.findById(theaterId)
+                    .orElseThrow(() -> new TheaterException("No theater exists with id [" + theaterId + "]"));
+            // save this theater to cache
+            theaterCacheRepo.saveTheater(theater);
+        } else {
+            log.info("theater details found in cache");
+        }
 
         return TheaterResponseDTO.builder()
                 .name(theater.getName())

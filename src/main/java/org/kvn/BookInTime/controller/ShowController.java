@@ -5,7 +5,6 @@ import org.kvn.BookInTime.dto.request.ShowCreationRequestDTO;
 import org.kvn.BookInTime.dto.response.ShowCreationResponseDTO;
 import org.kvn.BookInTime.enums.City;
 import org.kvn.BookInTime.model.Show;
-import org.kvn.BookInTime.repository.ShowRepo;
 import org.kvn.BookInTime.service.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

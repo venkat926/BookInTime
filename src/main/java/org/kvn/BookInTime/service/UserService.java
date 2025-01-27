@@ -8,9 +8,9 @@ import org.kvn.BookInTime.enums.UserType;
 import org.kvn.BookInTime.model.Review;
 import org.kvn.BookInTime.model.Ticket;
 import org.kvn.BookInTime.model.Users;
-import org.kvn.BookInTime.repository.ReviewRepo;
-import org.kvn.BookInTime.repository.TicketRepo;
-import org.kvn.BookInTime.repository.UserRepo;
+import org.kvn.BookInTime.repository.JPARepo.ReviewRepo;
+import org.kvn.BookInTime.repository.JPARepo.TicketRepo;
+import org.kvn.BookInTime.repository.JPARepo.UserRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @Service

@@ -13,10 +13,11 @@ import org.kvn.BookInTime.model.Seat;
 import org.kvn.BookInTime.model.Show;
 import org.kvn.BookInTime.model.Ticket;
 import org.kvn.BookInTime.model.Users;
-import org.kvn.BookInTime.repository.SeatRepo;
-import org.kvn.BookInTime.repository.ShowRepo;
-import org.kvn.BookInTime.repository.TicketRepo;
-import org.kvn.BookInTime.repository.UserRepo;
+import org.kvn.BookInTime.repository.JPARepo.SeatRepo;
+import org.kvn.BookInTime.repository.JPARepo.ShowRepo;
+import org.kvn.BookInTime.repository.JPARepo.TicketRepo;
+import org.kvn.BookInTime.repository.JPARepo.UserRepo;
+import org.kvn.BookInTime.repository.cacheRepo.TicketCacheRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,8 @@ public class TicketService {
     private UserRepo userRepo;
     @Autowired
     private TicketBookingNotification ticketBookingNotification;
+    @Autowired
+    private TicketCacheRepo ticketCacheRepo;
 
     @Transactional
     public TicketBookingResponseDTO bookTickets(TicketBookingRequestDTO requestDTO, Users user) {
@@ -60,7 +63,7 @@ public class TicketService {
         Ticket ticket = Ticket.builder()
                 .show(show)
                 .user(user)
-                .ticketStatus(TicketStatus.BOOKED) // TODO: update the schema and change it to IN_TRANSIT
+                .ticketStatus(TicketStatus.IN_TRANSIT) // TODO: update the schema and change it to IN_TRANSIT
                 .build();
         ticketRepo.save(ticket);
 
@@ -89,6 +92,9 @@ public class TicketService {
         user.setBookedTickets(userTickets);
         userRepo.save(user);
 
+        // save ticket to cache
+        ticketCacheRepo.saveTicket(ticket);
+
         TicketBookingResponseDTO responseDTO = TicketBookingResponseDTO.builder()
                 .ticketStatus(ticket.getTicketStatus())
                 .ticketPrice(ticket.getAmount())
@@ -110,8 +116,19 @@ public class TicketService {
     }
 
     public Ticket getTicketById(Integer ticketId) {
-        return ticketRepo.findById(ticketId)
-                .orElseThrow(() -> new TicketException("No such ticket with id: " + ticketId));
+        // check cache for ticket
+        Ticket ticket = ticketCacheRepo.getTicket(ticketId);
+        // if ticket details not found in cache
+        if (ticket == null)  {
+            log.info("ticket details not found in cache for id: {} : checking in DB", ticketId);
+            ticket = ticketRepo.findById(ticketId)
+                    .orElseThrow(() -> new TicketException("No such ticket with id: " + ticketId));
+            // save ticket to cache
+            ticketCacheRepo.saveTicket(ticket, ticket.getShow(), ticket.getBookedSeats());
+        } else {
+            log.info("Ticket details are found in cache for id: {}", ticketId);
+        }
+        return ticket;
     }
 
     @Transactional
@@ -123,6 +140,8 @@ public class TicketService {
         // update ticket status to CANCELLED
         ticket.setTicketStatus(TicketStatus.CANCELLED);
         ticketRepo.save(ticket);
+        // save ticket details to cache
+        ticketCacheRepo.saveTicket(ticket, ticket.getShow(), ticket.getBookedSeats());
 
         // update seats status to booked false
         List<Seat> bookedSeats = ticket.getBookedSeats();

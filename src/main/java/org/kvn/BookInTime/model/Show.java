@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.kvn.BookInTime.enums.ShowTiming;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "shows")
-public class Show {
+public class Show implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
