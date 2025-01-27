@@ -63,7 +63,7 @@ public class TicketService {
         Ticket ticket = Ticket.builder()
                 .show(show)
                 .user(user)
-                .ticketStatus(TicketStatus.IN_TRANSIT) // TODO: update the schema and change it to IN_TRANSIT
+                .ticketStatus(TicketStatus.IN_TRANSIT)
                 .build();
         ticketRepo.save(ticket);
 

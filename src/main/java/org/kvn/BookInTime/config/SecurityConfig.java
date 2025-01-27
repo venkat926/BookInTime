@@ -18,7 +18,6 @@ public class SecurityConfig {
     private String adminAuthority;
 
     // User Authorization
-    // TODO: update requestMatchers after adding APIs
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
